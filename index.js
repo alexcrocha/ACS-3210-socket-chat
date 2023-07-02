@@ -10,14 +10,17 @@ app.get('/', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-  io.emit('chat message', 'A user has connected');
+  socket.on('nickname', (nickname) => {
+    socket.nickname = nickname;
+    io.emit('chat message', { nickname: 'Server', message: `${nickname} has joined the chat!` });
+  });
 
   socket.on('chat message', (msg) => {
     io.emit('chat message', msg);
   });
 
   socket.on('disconnect', () => {
-    io.emit('chat message', 'A user has disconnected');
+    io.emit('chat message', { nickname: 'Server', message: `${socket.nickname} has left the chat!` });
   });
 });
 

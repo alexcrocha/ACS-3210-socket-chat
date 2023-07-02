@@ -63,7 +63,10 @@
 
 <body>
   <ul id="messages"></ul>
-  <form id="form" action="">
+  <div id="nicknameForm" action="">
+    <input id="nickname" placeholder="Enter your nickname" /><button id="confirmNickname">OK</button>
+  </div>
+  <form id="form" action="" style="display:none;">
     <input id="input" autocomplete="off" /><button>Send</button>
   </form>
 <script src="/socket.io/socket.io.js"></script>
@@ -73,18 +76,30 @@
   var messages = document.getElementById('messages');
   var form = document.getElementById('form');
   var input = document.getElementById('input');
+  var nicknameForm = document.getElementById('nicknameForm');
+  var nicknameInput = document.getElementById('nickname');
+  var confirmNickname = document.getElementById('confirmNickname');
+
+  confirmNickname.addEventListener('click', function (e) {
+    e.preventDefault();
+    if (nicknameInput.value) {
+      socket.emit('nickname', nicknameInput.value);
+      form.style.display = "flex";
+      nicknameForm.style.display = "none";
+    }
+  });
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
     if (input.value) {
-      socket.emit('chat message', input.value);
+      socket.emit('chat message', { nickname: nicknameInput.value, message: input.value });
       input.value = '';
     }
   });
 
   socket.on('chat message', function (msg) {
     var item = document.createElement('li');
-    item.textContent = msg;
+    item.textContent = msg.nickname + ': ' + msg.message;
     messages.appendChild(item);
     window.scrollTo(0, document.body.scrollHeight);
   });
