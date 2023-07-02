@@ -5,8 +5,10 @@ const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
 
+app.use(express.static(__dirname + '/public'));
+
 app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
+  res.sendFile(__dirname + '/public/index.html');
 });
 
 io.on('connection', (socket) => {
@@ -23,7 +25,6 @@ io.on('connection', (socket) => {
     io.emit('chat message', { nickname: 'Server', message: `${socket.nickname} has left the chat!` });
   });
 });
-
 
 server.listen(3000, () => {
   console.log('listening on *:3000');
